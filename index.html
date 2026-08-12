@@ -119,6 +119,15 @@
               <option value="low">0–44</option>
             </select>
           </label>
+          <label>
+            WhatsApp status
+            <select id="whatsappStatusFilter">
+              <option value="all">Any WhatsApp status</option>
+              <option value="confirmed">Confirmed on WhatsApp</option>
+              <option value="not_on_whatsapp">Not on WhatsApp</option>
+              <option value="unknown">Unknown</option>
+            </select>
+          </label>
           <label class="checkbox-row">
             <input id="phoneOnlyFilter" type="checkbox" />
             <span>Only leads with phone numbers</span>
@@ -223,6 +232,13 @@
               <option value="do_not_contact">Do not contact</option>
             </select>
           </label>
+          <label>WhatsApp status
+            <select id="leadWhatsappStatusSelect">
+              <option value="unknown">Unknown</option>
+              <option value="confirmed">Confirmed on WhatsApp</option>
+              <option value="not_on_whatsapp">Not on WhatsApp</option>
+            </select>
+          </label>
           <label>Follow-up date
             <input id="followupInput" type="date" />
           </label>
@@ -242,5 +258,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <script src="/app.js" defer></script>
+  <script src="/whatsapp-status.js" defer></script>
 </body>
 </html>
