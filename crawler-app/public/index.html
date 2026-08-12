@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="description" content="A practical Crawlee-powered web crawler for building Client Gen lead datasets." />
+  <link rel="stylesheet" href="/styles.css" />
+  <title>Mahoraga Crawler · GOJO.DEV</title>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to crawler</a>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Mahoraga Crawler home"><span class="mark">MC</span><span><strong>MAHORAGA CRAWLER</strong><small>Crawlee-powered · GOJO.DEV</small></span></a>
+    <a class="client-link" href="https://client-gen.vercel.app" target="_blank" rel="noopener">Open Client Gen ↗</a>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">PUBLIC-WEB CRAWLER</p>
+        <h1>Give it a website.<br><span>It brings back leads.</span></h1>
+        <p class="lede">A usable interface over Crawlee. It follows public links, respects robots.txt, extracts business/contact signals, deduplicates them and exports clean data for Client Gen.</p>
+      </div>
+      <div class="engine-note"><span>ENGINE</span><strong>Crawlee 3.17</strong><small>CheerioCrawler · fast HTTP mode</small></div>
+    </section>
+
+    <section class="layout">
+      <form class="control" id="crawlForm">
+        <div class="section-head"><span>01</span><div><p>START</p><h2>Crawl target</h2></div></div>
+        <label>Project label <input id="labelInput" maxlength="120" placeholder="e.g. Lagos private schools" /></label>
+        <label>Start URL(s) <textarea id="urlInput" rows="5" required placeholder="https://example.com&#10;https://another-directory.com"></textarea><small>Up to 5 public HTTP(S) URLs. One per line.</small></label>
+        <div class="two-col">
+          <label>Max pages <input id="maxPagesInput" type="number" min="1" max="100" value="30" /></label>
+          <label>Max depth <input id="maxDepthInput" type="number" min="0" max="3" value="1" /></label>
+          <label>Concurrency <input id="concurrencyInput" type="number" min="1" max="5" value="2" /></label>
+          <label>Delay / host <input id="delayInput" type="number" min="0.5" max="10" step="0.5" value="1" /></label>
+        </div>
+        <label class="check"><input id="followLinksInput" type="checkbox" checked /><span>Follow same-host links recursively</span></label>
+        <div class="ethics"><strong>Default manners are on.</strong><span>robots.txt is respected. Private/local network targets, huge crawls and cross-host wandering are blocked.</span></div>
+        <div class="actions"><button class="primary" id="startBtn" type="submit">Start crawl</button><button class="secondary" id="stopBtn" type="button" disabled>Stop</button></div>
+        <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
+      </form>
+
+      <section class="results" aria-live="polite">
+        <div class="section-head"><span>02</span><div><p>RESULTS</p><h2>Lead harvest</h2></div></div>
+        <div class="stats">
+          <div><span>Status</span><strong id="statStatus">Idle</strong></div>
+          <div><span>Pages</span><strong id="statPages">0</strong></div>
+          <div><span>Leads</span><strong id="statLeads">0</strong></div>
+          <div><span>Failed</span><strong id="statFailed">0</strong></div>
+        </div>
+        <div class="progress"><span id="progressBar"></span></div>
+        <div class="result-actions"><a id="jsonExport" class="secondary disabled" href="#">Download JSON</a><a id="csvExport" class="secondary disabled" href="#">Download CSV</a></div>
+        <div id="emptyState" class="empty"><strong>No crawl yet.</strong><span>Point it at a public site and let the tiny robots do their paperwork.</span></div>
+        <div id="leadTableWrap" class="table-wrap" hidden>
+          <table><thead><tr><th>Business</th><th>Type</th><th>Phone</th><th>Email</th><th>Address</th><th>Source</th></tr></thead><tbody id="leadRows"></tbody></table>
+        </div>
+        <details id="errorDetails" hidden><summary>Errors / skipped pages</summary><pre id="errorLog"></pre></details>
+      </section>
+    </section>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>
