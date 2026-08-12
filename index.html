@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0d0c" />
+  <meta name="description" content="Mahoraga-style lead organizer: import messy crawler data, normalize it, score leads, and draft contextual WhatsApp outreach." />
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/styles.css" />
+  <title>Client Gen · GOJO.DEV</title>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to leads</a>
+
+  <header class="topbar">
+    <div class="brand" aria-label="Client Gen">
+      <span class="brand-mark" aria-hidden="true">CG</span>
+      <span>
+        <strong>CLIENT GEN</strong>
+        <small>by GOJO.DEV</small>
+      </span>
+    </div>
+    <div class="top-actions">
+      <span class="privacy-chip" title="Your imported lead files are processed in this browser">Local-first</span>
+      <button class="icon-button" id="themeBtn" type="button" aria-label="Toggle theme" title="Toggle theme">
+        <span aria-hidden="true">◐</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="intro" aria-labelledby="pageTitle">
+      <div>
+        <p class="eyebrow">LEAD INTELLIGENCE WORKSPACE</p>
+        <h1 id="pageTitle">Messy crawler data in.<br><span>Useful conversations out.</span></h1>
+        <p class="intro-copy">Import almost any lead export, let the schema adapter figure out what is what, then sort, score, personalize and open each lead directly in WhatsApp with the message prefilled.</p>
+      </div>
+      <div class="intro-meta">
+        <div><strong id="leadCountHero">0</strong><span>leads loaded</span></div>
+        <div><strong id="dueCountHero">0</strong><span>follow-ups due</span></div>
+      </div>
+    </section>
+
+    <section class="import-panel" id="importPanel" aria-labelledby="importTitle">
+      <div class="import-copy">
+        <p class="section-kicker">01 / IMPORT</p>
+        <h2 id="importTitle">Feed it whatever your crawler vomited out.</h2>
+        <p>JSON, NDJSON, CSV, TSV, Excel, XML and HTML tables. Nested records are detected automatically.</p>
+        <div class="format-list" aria-label="Supported formats">
+          <span>JSON</span><span>NDJSON</span><span>CSV</span><span>TSV</span><span>XLSX</span><span>XLS</span><span>XML</span><span>HTML</span>
+        </div>
+      </div>
+      <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-describedby="dropHint">
+        <input type="file" id="fileInput" multiple accept=".json,.ndjson,.jsonl,.csv,.tsv,.xlsx,.xls,.xml,.html,.htm,text/csv,application/json" hidden />
+        <span class="drop-icon" aria-hidden="true">↥</span>
+        <strong>Drop files here</strong>
+        <span id="dropHint">or tap to choose from your device</span>
+        <button class="primary-button" id="chooseFileBtn" type="button">Choose files</button>
+      </div>
+      <p class="import-status" id="importStatus" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="workspace" id="workspace" hidden>
+      <aside class="sidebar" aria-label="Workspace controls">
+        <section class="side-section">
+          <p class="section-kicker">02 / SIGNAL</p>
+          <h2>Lead radar</h2>
+          <div class="metric-grid">
+            <div><span>High priority</span><strong id="metricHot">0</strong></div>
+            <div><span>Contactable</span><strong id="metricPhones">0</strong></div>
+            <div><span>Interested</span><strong id="metricInterested">0</strong></div>
+            <div><span>Won</span><strong id="metricWon">0</strong></div>
+          </div>
+        </section>
+
+        <section class="side-section">
+          <div class="side-heading-row">
+            <div>
+              <p class="section-kicker">SCHEMA</p>
+              <h2>Mahoraga map</h2>
+            </div>
+            <button class="text-button" id="openMappingBtn" type="button">Edit</button>
+          </div>
+          <div id="mappingSummary" class="mapping-summary"></div>
+        </section>
+
+        <section class="side-section filters-section">
+          <p class="section-kicker">FILTERS</p>
+          <label>
+            Search
+            <input id="searchInput" type="search" placeholder="Business, area, phone…" autocomplete="off" />
+          </label>
+          <label>
+            Business type
+            <select id="typeFilter"><option value="all">All types</option></select>
+          </label>
+          <label>
+            Status
+            <select id="statusFilter">
+              <option value="all">All statuses</option>
+              <option value="new">New</option>
+              <option value="contacted">Contacted</option>
+              <option value="replied">Replied</option>
+              <option value="interested">Interested</option>
+              <option value="follow_up">Follow-up</option>
+              <option value="won">Won</option>
+              <option value="not_interested">Not interested</option>
+              <option value="do_not_contact">Do not contact</option>
+            </select>
+          </label>
+          <label>
+            Priority
+            <select id="priorityFilter">
+              <option value="all">Any score</option>
+              <option value="hot">70–100</option>
+              <option value="warm">45–69</option>
+              <option value="low">0–44</option>
+            </select>
+          </label>
+          <label class="checkbox-row">
+            <input id="phoneOnlyFilter" type="checkbox" />
+            <span>Only leads with phone numbers</span>
+          </label>
+        </section>
+
+        <section class="side-section">
+          <p class="section-kicker">TOOLS</p>
+          <div class="tool-stack">
+            <button class="secondary-button" id="exportCsvBtn" type="button">Export filtered CSV</button>
+            <button class="secondary-button" id="exportWorkspaceBtn" type="button">Backup workspace</button>
+            <button class="danger-button" id="clearBtn" type="button">Clear local data</button>
+          </div>
+        </section>
+      </aside>
+
+      <section class="leads-area" aria-labelledby="leadListTitle">
+        <div class="leads-toolbar">
+          <div>
+            <p class="section-kicker">03 / OUTREACH</p>
+            <h2 id="leadListTitle">Leads <span id="visibleLeadCount">0</span></h2>
+          </div>
+          <div class="toolbar-actions">
+            <label class="compact-label">Tone
+              <select id="toneSelect">
+                <option value="friendly">Friendly</option>
+                <option value="professional">Professional</option>
+                <option value="short">Short</option>
+              </select>
+            </label>
+            <label class="compact-label">Sort
+              <select id="sortSelect">
+                <option value="score_desc">Best leads</option>
+                <option value="name_asc">Name A–Z</option>
+                <option value="recent">Recently updated</option>
+                <option value="followup">Follow-ups first</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div id="emptyFiltered" class="empty-state" hidden>
+          <strong>No leads match those filters.</strong>
+          <span>Your filter combination has achieved the rare human accomplishment of being too specific.</span>
+        </div>
+        <div id="leadList" class="lead-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="mappingDialog" class="mapping-dialog">
+    <form method="dialog" class="dialog-shell" id="mappingForm">
+      <div class="dialog-header">
+        <div>
+          <p class="section-kicker">SCHEMA ADAPTER</p>
+          <h2>Tell it what the columns mean</h2>
+          <p>Auto-detected mappings include confidence. Change any wrong guess and all leads will be rebuilt instantly.</p>
+        </div>
+        <button class="icon-button" value="cancel" aria-label="Close mapping">×</button>
+      </div>
+      <div id="mappingGrid" class="mapping-grid"></div>
+      <div class="dialog-footer">
+        <span id="mappingDatasetLabel"></span>
+        <button class="primary-button" id="applyMappingBtn" value="default" type="submit">Apply mapping</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="leadDialog" class="lead-dialog">
+    <form method="dialog" class="dialog-shell lead-dialog-shell" id="leadForm">
+      <div class="dialog-header">
+        <div>
+          <p class="section-kicker">LEAD DETAIL</p>
+          <h2 id="dialogLeadName">Lead</h2>
+          <p id="dialogLeadMeta"></p>
+        </div>
+        <button class="icon-button" value="cancel" aria-label="Close lead details">×</button>
+      </div>
+      <div class="lead-detail-grid">
+        <div class="lead-detail-main">
+          <label>
+            Message
+            <textarea id="messageEditor" rows="9"></textarea>
+          </label>
+          <div class="message-actions">
+            <button class="secondary-button" id="regenerateBtn" type="button">Regenerate</button>
+            <button class="secondary-button" id="copyMessageBtn" type="button">Copy</button>
+            <a class="primary-button whatsapp-button" id="whatsappLink" href="#" target="_blank" rel="noopener">Open WhatsApp</a>
+          </div>
+          <p class="message-note">Opening WhatsApp does not send anything automatically. You review it and hit send yourself.</p>
+        </div>
+        <div class="lead-detail-side">
+          <label>Status
+            <select id="leadStatusSelect">
+              <option value="new">New</option>
+              <option value="contacted">Contacted</option>
+              <option value="replied">Replied</option>
+              <option value="interested">Interested</option>
+              <option value="follow_up">Follow-up</option>
+              <option value="won">Won</option>
+              <option value="not_interested">Not interested</option>
+              <option value="do_not_contact">Do not contact</option>
+            </select>
+          </label>
+          <label>Follow-up date
+            <input id="followupInput" type="date" />
+          </label>
+          <label>Notes
+            <textarea id="notesInput" rows="5" placeholder="What did they say? What should you remember?"></textarea>
+          </label>
+          <div id="rawContext" class="raw-context"></div>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="secondary-button" id="saveLeadBtn" type="button">Save changes</button>
+        <button class="primary-button" value="default">Done</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>
