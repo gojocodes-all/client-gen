@@ -1,0 +1,16 @@
+{
+  "name": "mahoraga-crawler",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node src/server.js",
+    "check": "node --check src/server.js && node --check public/app.js"
+  },
+  "dependencies": {
+    "crawlee": "3.17.0",
+    "express": "5.1.0",
+    "helmet": "8.1.0"
+  }
+}
