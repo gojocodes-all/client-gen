@@ -9,6 +9,9 @@
   const MAX_ROWS_PER_DATASET = 25000;
   const DEFAULT_PROFILE = { name: 'Gojo', brand: 'GOJO.DEV' };
 
+  if (!window.ClientGenDataParsers) throw new Error('Client Gen data parsers failed to load.');
+  const { extractRecordsFromJson, parseDelimited, detectDelimiter } = window.ClientGenDataParsers;
+
   const ROLE_CONFIG = {
     name: {
       label: 'Business name', hint: 'Company / business / organisation name',
@@ -261,89 +264,6 @@
       document.head.appendChild(script);
     });
     return xlsxPromise;
-  }
-
-  function extractRecordsFromJson(input) {
-    if (Array.isArray(input)) {
-      if (!input.length) return [];
-      if (input.every(isPlainObject)) return input;
-      return input.map((v, i) => isPlainObject(v) ? v : ({ index:i + 1, value:v }));
-    }
-    if (!isPlainObject(input)) return [{ value: input }];
-
-    const candidates = [];
-    walk(input, '$', 0);
-    if (candidates.length) {
-      candidates.sort((a,b) => b.score - a.score);
-      return candidates[0].rows;
-    }
-
-    const vals = Object.values(input);
-    if (vals.length > 1 && vals.every(isPlainObject)) return vals;
-    return [input];
-
-    function walk(node, path, depth) {
-      if (depth > 8 || node == null) return;
-      if (Array.isArray(node)) {
-        const objects = node.filter(isPlainObject);
-        if (objects.length) {
-          const keyCounts = new Map();
-          objects.slice(0, 100).forEach(obj => Object.keys(obj).forEach(k => keyCounts.set(k, (keyCounts.get(k) || 0) + 1)));
-          const common = [...keyCounts.values()].filter(n => n >= Math.max(2, objects.length * .5)).length;
-          candidates.push({ rows:objects, path, score:objects.length * (1 + Math.min(common, 12) / 4) - depth * 2 });
-        }
-        node.slice(0, 30).forEach((v,i) => walk(v, `${path}[${i}]`, depth + 1));
-      } else if (isPlainObject(node)) {
-        Object.entries(node).slice(0, 100).forEach(([k,v]) => walk(v, `${path}.${k}`, depth + 1));
-      }
-    }
-  }
-
-  function parseDelimited(text, delimiter) {
-    const matrix = [];
-    let row = [], cell = '', quoted = false;
-    for (let i = 0; i < text.length; i++) {
-      const ch = text[i];
-      if (quoted) {
-        if (ch === '"' && text[i + 1] === '"') { cell += '"'; i++; }
-        else if (ch === '"') quoted = false;
-        else cell += ch;
-      } else {
-        if (ch === '"') quoted = true;
-        else if (ch === delimiter) { row.push(cell); cell = ''; }
-        else if (ch === '\n') { row.push(cell); matrix.push(row); row = []; cell = ''; }
-        else if (ch !== '\r') cell += ch;
-      }
-    }
-    if (cell.length || row.length) { row.push(cell); matrix.push(row); }
-    while (matrix.length && matrix[0].every(v => !String(v).trim())) matrix.shift();
-    if (!matrix.length) return [];
-    const headers = makeUniqueHeaders(matrix.shift().map((h,i) => String(h).trim() || `column_${i + 1}`));
-    return matrix.filter(r => r.some(v => String(v).trim())).map(r => Object.fromEntries(headers.map((h,i) => [h, r[i] ?? ''])));
-  }
-
-  function detectDelimiter(text) {
-    const firstLines = text.split(/\r?\n/).slice(0, 6).join('\n');
-    const options = [',','\t',';','|'];
-    let best = ',', bestScore = -1;
-    for (const d of options) {
-      const counts = firstLines.split('\n').map(line => countOutsideQuotes(line, d));
-      const nonzero = counts.filter(Boolean);
-      const avg = nonzero.reduce((a,b) => a + b, 0) / Math.max(nonzero.length,1);
-      const variance = nonzero.reduce((a,b) => a + Math.abs(b - avg), 0) / Math.max(nonzero.length,1);
-      const score = avg * 3 - variance;
-      if (score > bestScore) { best = d; bestScore = score; }
-    }
-    return best;
-  }
-
-  function countOutsideQuotes(line, delimiter) {
-    let q = false, count = 0;
-    for (let i=0;i<line.length;i++) {
-      if (line[i] === '"') q = !q;
-      else if (!q && line[i] === delimiter) count++;
-    }
-    return count;
   }
 
   function parseHtmlTables(text) {
