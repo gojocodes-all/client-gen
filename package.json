@@ -1,0 +1,10 @@
+{
+  "name": "client-gen",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "check": "node --check app.js && node --check data-parsers.js && node --check whatsapp-status.js && node --check sw.js && npm --prefix crawler-app run check",
+    "test": "node --test",
+    "validate": "npm run check && npm test"
+  }
+}

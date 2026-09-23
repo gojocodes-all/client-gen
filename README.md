@@ -33,6 +33,16 @@ python3 -m http.server 8080
 
 Then open `http://localhost:8080`.
 
+## Development
+
+The JSON and delimited-text import rules live in `data-parsers.js`, separate from UI and persistence code. They work in both the browser and Node so the import contract can be tested without a DOM.
+
+Run all syntax checks—including the crawler package—and the parser regression suite with:
+
+```bash
+npm run validate
+```
+
 ## Deploy
 
 The repo is static and Vercel-compatible. No environment variables are required.
