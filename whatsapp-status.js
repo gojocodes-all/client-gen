@@ -15,10 +15,26 @@
   const visibleLeadCount = document.getElementById('visibleLeadCount');
   const saveLeadBtn = document.getElementById('saveLeadBtn');
 
-  if (!statusFilter || !statusSelect || !leadList || !leadDialog) return;
-
   let activeLeadId = null;
   let statuses = loadStatuses();
+
+  window.ClientGenWhatsAppStatus = {
+    clear() {
+      statuses = {};
+      let cleared = true;
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch (error) {
+        cleared = false;
+        console.warn('Could not clear WhatsApp statuses', error);
+      }
+      decorateCards();
+      applyFilter();
+      return cleared;
+    }
+  };
+
+  if (!statusFilter || !statusSelect || !leadList || !leadDialog) return;
 
   injectStyles();
   addExplanation();
@@ -87,6 +103,7 @@
   }
 
   function decorateCards() {
+    if (!leadList) return;
     leadList.querySelectorAll('.lead-card').forEach(card => {
       const id = card.dataset.id;
       const value = getStatus(id);
@@ -109,6 +126,7 @@
   }
 
   function applyFilter() {
+    if (!statusFilter || !leadList) return;
     const selected = statusFilter.value;
     let visible = 0;
     leadList.querySelectorAll('.lead-card').forEach(card => {
