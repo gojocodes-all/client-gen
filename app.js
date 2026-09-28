@@ -775,7 +775,13 @@
   async function clearWorkspace() {
     if (!confirm('Clear all imported leads, notes, statuses and mappings from this device? This cannot be undone unless you exported a backup.')) return;
     state.datasets = []; state.leads = []; state.activeDatasetId = null; state.activeLeadId = null;
-    await idbSet('state', null); render(); els.importStatus.textContent = ''; toast('Local workspace cleared.');
+    const storageResults = await Promise.allSettled([
+      idbSet('state', null),
+      Promise.resolve().then(() => window.ClientGenWhatsAppStatus?.clear())
+    ]);
+    const fullyCleared = storageResults.every(result => result.status === 'fulfilled' && result.value !== false);
+    render(); els.importStatus.textContent = '';
+    toast(fullyCleared ? 'Local workspace cleared.' : 'Cleared from this tab, but browser storage could not be fully cleared.');
   }
 
   function objectsToCsv(rows) {

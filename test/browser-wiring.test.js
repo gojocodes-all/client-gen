@@ -39,7 +39,48 @@ test('browser entrypoint loads the parser module before the UI controller', () =
 test('offline core cache includes every required application script', () => {
   const serviceWorker = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 
+  assert.match(serviceWorker, /const CACHE = 'client-gen-v4';/);
   assert.match(serviceWorker, /'\/data-parsers\.js'/);
   assert.match(serviceWorker, /'\/app\.js'/);
   assert.match(serviceWorker, /'\/whatsapp-status\.js'/);
+});
+
+test('WhatsApp status storage can be cleared without the interface mounted', () => {
+  const removedKeys = [];
+  const browserGlobal = {
+    console,
+    document: {
+      getElementById() { return null; }
+    },
+    localStorage: {
+      getItem() { return JSON.stringify({ lead_1:'confirmed' }); },
+      removeItem(key) { removedKeys.push(key); }
+    }
+  };
+  browserGlobal.window = browserGlobal;
+  const context = vm.createContext(browserGlobal);
+
+  vm.runInContext(fs.readFileSync(path.join(root, 'whatsapp-status.js'), 'utf8'), context, { filename:'whatsapp-status.js' });
+  context.ClientGenWhatsAppStatus.clear();
+
+  assert.deepEqual(removedKeys, ['client-gen-whatsapp-status-v1']);
+});
+
+test('WhatsApp status cleanup reports unavailable browser storage', () => {
+  const browserGlobal = {
+    console: { warn() {} },
+    document: {
+      getElementById() { return null; }
+    },
+    localStorage: {
+      getItem() { throw new Error('storage blocked'); },
+      removeItem() { throw new Error('storage blocked'); }
+    }
+  };
+  browserGlobal.window = browserGlobal;
+  const context = vm.createContext(browserGlobal);
+
+  vm.runInContext(fs.readFileSync(path.join(root, 'whatsapp-status.js'), 'utf8'), context, { filename:'whatsapp-status.js' });
+
+  assert.equal(context.ClientGenWhatsAppStatus.clear(), false);
 });

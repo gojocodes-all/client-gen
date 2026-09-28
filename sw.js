@@ -1,4 +1,4 @@
-const CACHE = 'client-gen-v3';
+const CACHE = 'client-gen-v4';
 const CORE = ['/', '/index.html', '/styles.css', '/data-parsers.js', '/app.js', '/whatsapp-status.js', '/manifest.webmanifest', '/icon.svg'];
 
 self.addEventListener('install', event => {
