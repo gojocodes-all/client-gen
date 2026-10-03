@@ -43,6 +43,8 @@ Run all syntax checks—including the crawler package—and the parser regressio
 npm run validate
 ```
 
+The root validation suite requires Node.js 20 or newer and does not install crawler dependencies. GitHub Actions runs the same command for pull requests and updates to `main`.
+
 ## Deploy
 
 The repo is static and Vercel-compatible. No environment variables are required.
