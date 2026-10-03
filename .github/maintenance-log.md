@@ -4,7 +4,7 @@
 
 - **Rationale:** The repository had a complete dependency-free validation command but no hosted workflow, so parser, browser-wiring, service-worker, storage-cleanup, or crawler syntax regressions could be merged without running it.
 - **Files changed:** Added `.github/workflows/ci.yml`; updated `package.json`, `README.md`, and `.github/maintenance-log.md`.
-- **Validation:** Ran `npm run validate` (ten tests and all application/crawler syntax checks), parsed the workflow YAML, verified immutable action pins and read-only permissions, checked the Node.js engine contract, and ran `git diff --check`. A separate crawler dependency audit still reports upstream high-severity advisories; no uncertain dependency change is included in this CI-only update.
+- **Validation:** Ran `npm run validate` (ten tests and all application/crawler syntax checks), parsed the workflow YAML, verified immutable Node.js 24 action pins and read-only permissions, checked the Node.js engine contract, and ran `git diff --check`. The hosted workflow passed without action-runtime deprecation warnings. A separate crawler dependency audit still reports upstream high-severity advisories; no uncertain dependency change is included in this CI-only update.
 - **Risk:** Low. The workflow only reads repository contents and runs an existing dependency-free command on Node.js 20. Application, crawler runtime, dependencies, and deployment behavior are unchanged.
 - **Rollback:** Revert this pull request or remove `.github/workflows/ci.yml` to stop hosted validation; runtime behavior is unaffected.
 
