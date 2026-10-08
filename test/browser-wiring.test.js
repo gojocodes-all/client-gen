@@ -84,3 +84,13 @@ test('WhatsApp status cleanup reports unavailable browser storage', () => {
 
   assert.equal(context.ClientGenWhatsAppStatus.clear(), false);
 });
+
+test('mobile layout keeps lead details available and names repeated actions', () => {
+  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+  const styles = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
+
+  assert.match(app, /data-action="open" aria-label="View details for/);
+  assert.match(app, /data-action="wa" aria-label="Open WhatsApp for/);
+  assert.doesNotMatch(styles, /\.lead-actions \.mini-button:first-child\s*\{\s*display:\s*none/);
+  assert.match(styles, /\.lead-actions\s*\{\s*flex-direction:\s*column;\s*\}/);
+});
