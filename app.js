@@ -619,8 +619,8 @@
       <div class="lead-signal location-signal"><strong>${escapeHtml(loc)}</strong><span>${escapeHtml(lead.typeLabel)}</span></div>
       <div class="lead-signal"><span class="status-badge ${lead.status}">${escapeHtml(STATUS_LABELS[lead.status] || lead.status)}</span><span>${escapeHtml(contact)}</span></div>
       <div class="lead-actions">
-        <button class="mini-button" type="button" data-action="open">Details</button>
-        <button class="mini-button wa" type="button" data-action="wa" ${disabled ? 'disabled' : ''}>WhatsApp</button>
+        <button class="mini-button" type="button" data-action="open" aria-label="View details for ${escapeAttr(lead.name)}">Details</button>
+        <button class="mini-button wa" type="button" data-action="wa" aria-label="Open WhatsApp for ${escapeAttr(lead.name)}" ${disabled ? 'disabled' : ''}>WhatsApp</button>
       </div>
     </article>`;
   }
