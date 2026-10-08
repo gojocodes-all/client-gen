@@ -1,5 +1,13 @@
 # Maintenance log
 
+## 2026-10-08 — Restore mobile access to lead details
+
+- **Rationale:** At widths of 620px and below, the responsive stylesheet hid every lead card's Details button. Because cards have no alternate click or keyboard handler, phone users could not edit status, notes, follow-up dates, or outreach copy.
+- **Files changed:** Updated `app.js` with lead-specific accessible action names, updated `styles.css` to stack both card actions on narrow screens, extended `test/browser-wiring.test.js`, and updated this log.
+- **Validation:** Ran the complete `npm run validate` workflow through GitHub Actions (application and crawler syntax checks plus the Node.js test suite), verified the narrow-screen rule no longer hides Details, and reviewed the full diff for accessibility, responsive layout, backward compatibility, security, and project scope.
+- **Risk:** Low. The change only affects lead-card action presentation below 620px and accessible names; data handling, persistence, outreach generation, and desktop layout are unchanged.
+- **Rollback:** Revert this pull request to restore the single visible mobile action and the previous generic button names.
+
 ## 2026-10-03 — Add continuous validation
 
 - **Rationale:** The repository had a complete dependency-free validation command but no hosted workflow, so parser, browser-wiring, service-worker, storage-cleanup, or crawler syntax regressions could be merged without running it.
