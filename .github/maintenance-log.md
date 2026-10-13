@@ -1,5 +1,13 @@
 # Maintenance log
 
+## 2026-10-13 — Document the optional crawler application
+
+- **Rationale:** The root README described the entire repository as static even though `crawler-app/` is a separate Node.js Express/Crawlee service. That made the crawler difficult to discover and left its setup and deployment boundary unclear.
+- **Files changed:** Updated `README.md` to distinguish the static Client Gen workspace from the optional crawler, document the crawler's verified local startup path, and clarify that the two applications deploy independently; updated this log.
+- **Validation:** Matched the documented commands, Node.js requirement, default port, and `PORT` override against both package manifests and `crawler-app/src/server.js`; verified the relative crawler-guide link and reviewed the complete documentation diff for accuracy, security, backward compatibility, and project scope.
+- **Risk:** Low. Documentation only; application code, dependencies, stored data, crawler behavior, and deployment configuration are unchanged.
+- **Rollback:** Revert this pull request to restore the previous root README and maintenance entry.
+
 ## 2026-10-08 — Restore mobile access to lead details
 
 - **Rationale:** At widths of 620px and below, the responsive stylesheet hid every lead card's Details button. Because cards have no alternate click or keyboard handler, phone users could not edit status, notes, follow-up dates, or outreach copy.
