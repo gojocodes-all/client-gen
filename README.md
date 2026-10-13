@@ -23,6 +23,23 @@ This app intentionally uses modern browser APIs rather than a framework because 
 
 Excel parsing is loaded on demand from the pinned SheetJS Community Edition standalone build (`0.20.3`) hosted by the official SheetJS CDN. JSON/CSV/TSV/XML/HTML parsing is handled locally. XML files containing `DOCTYPE` are rejected before parsing.
 
+## Repository layout
+
+The repository contains two independently-run applications:
+
+- The repository root is the static, local-first Client Gen workspace. It imports lead files in the browser and stores the workspace in IndexedDB.
+- `crawler-app/` is an optional Node.js 20+ Express/Crawlee service for collecting public business signals. It exports JSON or CSV that can then be imported into the root workspace; the two applications do not require a live connection to each other.
+
+To run the optional crawler locally:
+
+```bash
+cd crawler-app
+npm install
+npm start
+```
+
+Open `http://localhost:3000`. Set `PORT` to use a different port. See [the crawler guide](crawler-app/README.md) for its scope and limitations.
+
 ## Run locally
 
 Serve the directory with any static file server. For example:
@@ -47,7 +64,7 @@ The root validation suite requires Node.js 20 or newer and does not install craw
 
 ## Deploy
 
-The repo is static and Vercel-compatible. No environment variables are required.
+The root Client Gen workspace is static and Vercel-compatible. It requires no environment variables. The optional `crawler-app/` service is a separate long-running Node.js process and is not deployed by the root static-site configuration; host it separately if you need the crawler outside local development.
 
 ## Privacy / outreach behavior
 
