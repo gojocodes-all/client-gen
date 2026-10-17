@@ -1,5 +1,13 @@
 # Maintenance log
 
+## 2026-10-17 — Make schema-dialog cancellation non-destructive
+
+- **Rationale:** The schema dialog's × control omitted an explicit button type, so HTML treated it as a submit button. Client Gen's mapping-form submit handler therefore applied pending field mappings before closing the dialog, even though the control was presented and labelled as “Close.”
+- **Files changed:** Updated `index.html` with an explicit non-submit close control, wired that control in `app.js`, added the regression contract in `test/browser-wiring.test.js`, advanced the offline cache in `sw.js`, and updated this log.
+- **Validation:** Ran `npm run validate` (application and crawler syntax checks plus the complete Node.js test suite), verified the close control is separate from the apply submit path, and reviewed the complete diff for accessibility, mobile behavior, security, backward compatibility, and project scope.
+- **Risk:** Low. Applying mappings still uses the existing submit handler; Escape and the dedicated × control now dismiss without changing workspace data. No stored-data format, import logic, dependency, or crawler behavior changes.
+- **Rollback:** Revert this pull request to restore the previous implicit-submit close behavior and offline cache key.
+
 ## 2026-10-13 — Document the optional crawler application
 
 - **Rationale:** The root README described the entire repository as static even though `crawler-app/` is a separate Node.js Express/Crawlee service. That made the crawler difficult to discover and left its setup and deployment boundary unclear.

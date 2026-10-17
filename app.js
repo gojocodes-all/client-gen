@@ -125,7 +125,7 @@
       'themeBtn','leadCountHero','dueCountHero','importPanel','dropZone','fileInput','chooseFileBtn','importStatus','workspace',
       'metricHot','metricPhones','metricInterested','metricWon','openMappingBtn','mappingSummary','searchInput','typeFilter','statusFilter',
       'priorityFilter','phoneOnlyFilter','exportCsvBtn','exportWorkspaceBtn','clearBtn','visibleLeadCount','toneSelect','sortSelect','emptyFiltered',
-      'leadList','mappingDialog','mappingForm','mappingGrid','mappingDatasetLabel','applyMappingBtn','leadDialog','leadForm','dialogLeadName',
+      'leadList','mappingDialog','mappingCloseBtn','mappingForm','mappingGrid','mappingDatasetLabel','applyMappingBtn','leadDialog','leadForm','dialogLeadName',
       'dialogLeadMeta','messageEditor','regenerateBtn','copyMessageBtn','whatsappLink','leadStatusSelect','followupInput','notesInput','rawContext','saveLeadBtn','toast'
     ];
     ids.forEach(id => els[id] = document.getElementById(id));
@@ -153,6 +153,7 @@
     els.sortSelect.addEventListener('change', e => { state.sort = e.target.value; saveWorkspace(); renderLeads(); });
 
     els.openMappingBtn.addEventListener('click', () => openMappingDialog());
+    els.mappingCloseBtn.addEventListener('click', () => els.mappingDialog.close());
     els.mappingForm.addEventListener('submit', e => {
       e.preventDefault();
       applyMappingFromDialog();

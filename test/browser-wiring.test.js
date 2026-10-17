@@ -39,7 +39,7 @@ test('browser entrypoint loads the parser module before the UI controller', () =
 test('offline core cache includes every required application script', () => {
   const serviceWorker = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 
-  assert.match(serviceWorker, /const CACHE = 'client-gen-v4';/);
+  assert.match(serviceWorker, /const CACHE = 'client-gen-v5';/);
   assert.match(serviceWorker, /'\/data-parsers\.js'/);
   assert.match(serviceWorker, /'\/app\.js'/);
   assert.match(serviceWorker, /'\/whatsapp-status\.js'/);
@@ -93,4 +93,19 @@ test('mobile layout keeps lead details available and names repeated actions', ()
   assert.match(app, /data-action="wa" aria-label="Open WhatsApp for/);
   assert.doesNotMatch(styles, /\.lead-actions \.mini-button:first-child\s*\{\s*display:\s*none/);
   assert.match(styles, /\.lead-actions\s*\{\s*flex-direction:\s*column;\s*\}/);
+});
+
+
+test('mapping dialog close button dismisses without submitting changes', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+
+  assert.match(
+    html,
+    /id="mappingCloseBtn" type="button" aria-label="Close mapping"/,
+  );
+  assert.match(
+    app,
+    /els\.mappingCloseBtn\.addEventListener\('click', \(\) => els\.mappingDialog\.close\(\)\);/,
+  );
 });
