@@ -118,9 +118,11 @@
       badge.textContent = LABELS[value];
 
       const waButton = card.querySelector('[data-action="wa"]');
-      if (waButton && value === 'not_on_whatsapp') {
-        waButton.disabled = true;
-        waButton.title = 'Marked as not on WhatsApp';
+      if (waButton) {
+        const baseDisabled = waButton.dataset.baseDisabled === 'true';
+        const statusDisabled = value === 'not_on_whatsapp';
+        waButton.disabled = baseDisabled || statusDisabled;
+        waButton.title = statusDisabled ? 'Marked as not on WhatsApp' : '';
       }
     });
   }

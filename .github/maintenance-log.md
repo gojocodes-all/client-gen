@@ -1,5 +1,29 @@
 # Maintenance log
 
+## 2026-10-23 — Restore WhatsApp actions after status correction
+
+- **Rationale:** Marking a lead as “Not on WhatsApp” correctly disabled its
+  WhatsApp action, but changing that status to “Confirmed on WhatsApp” left the
+  same button disabled until another action rerendered the entire lead list.
+  Users could correct the status but still could not open the conversation.
+- **Files changed:** Updated `app.js` to expose whether each WhatsApp action is
+  unavailable for a lead-level reason; updated `whatsapp-status.js` to
+  recompute both disabled and enabled states whenever a verification status
+  changes; added a browser-like transition regression test in
+  `test/browser-wiring.test.js`; advanced the offline cache in `sw.js`; and
+  updated this log.
+- **Validation:** Reproduced the stale disabled state with the new test before
+  applying the fix; ran `npm run validate` (application and crawler syntax
+  checks plus the complete Node.js test suite); ran `git diff --check`; and
+  reviewed the complete diff for unavailable-phone and do-not-contact guards,
+  accessibility, offline delivery, backward compatibility, and project scope.
+- **Risk:** Low. Leads without a usable phone number and leads marked “Do not
+  contact” remain disabled through the existing lead-level guard. The change
+  only restores an otherwise available action after its separate WhatsApp
+  verification status is corrected.
+- **Rollback:** Revert this pull request to restore the previous one-way
+  WhatsApp-status disabling behavior and offline cache version.
+
 ## 2026-10-17 — Make schema-dialog cancellation non-destructive
 
 - **Rationale:** The schema dialog's × control omitted an explicit button type, so HTML treated it as a submit button. Client Gen's mapping-form submit handler therefore applied pending field mappings before closing the dialog, even though the control was presented and labelled as “Close.”
