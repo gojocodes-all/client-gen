@@ -39,7 +39,7 @@ test('browser entrypoint loads the parser module before the UI controller', () =
 test('offline core cache includes every required application script', () => {
   const serviceWorker = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 
-  assert.match(serviceWorker, /const CACHE = 'client-gen-v5';/);
+  assert.match(serviceWorker, /const CACHE = 'client-gen-v6';/);
   assert.match(serviceWorker, /'\/data-parsers\.js'/);
   assert.match(serviceWorker, /'\/app\.js'/);
   assert.match(serviceWorker, /'\/whatsapp-status\.js'/);
@@ -83,6 +83,82 @@ test('WhatsApp status cleanup reports unavailable browser storage', () => {
   vm.runInContext(fs.readFileSync(path.join(root, 'whatsapp-status.js'), 'utf8'), context, { filename:'whatsapp-status.js' });
 
   assert.equal(context.ClientGenWhatsAppStatus.clear(), false);
+});
+
+test('confirming a WhatsApp lead restores its available action immediately', () => {
+  const listeners = new Map();
+  const badge = { dataset:{}, textContent:'' };
+  const whatsappButton = {
+    dataset:{ action:'wa', baseDisabled:'false' },
+    disabled:false,
+    title:'',
+  };
+  const card = {
+    dataset:{ id:'lead_1' },
+    style:{},
+    querySelector(selector) {
+      if (selector === '.wa-status-chip') return badge;
+      if (selector === '[data-action="wa"]') return whatsappButton;
+      return null;
+    },
+  };
+  const leadList = {
+    addEventListener(type, listener) { listeners.set(type, listener); },
+    querySelectorAll(selector) { return selector === '.lead-card' ? [card] : []; },
+  };
+  const statusFilter = {
+    value:'all',
+    addEventListener(type, listener) { listeners.set(`filter:${type}`, listener); },
+  };
+  const statusSelect = {
+    value:'unknown',
+    parentElement:{ appendChild() {}, querySelector() { return null; } },
+    addEventListener(type, listener) { listeners.set(`status:${type}`, listener); },
+  };
+  const elements = {
+    whatsappStatusFilter:statusFilter,
+    leadWhatsappStatusSelect:statusSelect,
+    leadList,
+    leadDialog:{ open:false },
+    visibleLeadCount:{ textContent:'1' },
+    saveLeadBtn:{ addEventListener() {} },
+  };
+  const browserGlobal = {
+    console,
+    document:{
+      createElement() { return { className:'', textContent:'' }; },
+      getElementById(id) { return elements[id] || null; },
+      head:{ appendChild() {} },
+    },
+    localStorage:{ getItem() { return null; }, setItem() {} },
+    MutationObserver:class { constructor() {} observe() {} },
+  };
+  browserGlobal.window = browserGlobal;
+  const context = vm.createContext(browserGlobal);
+
+  vm.runInContext(fs.readFileSync(path.join(root, 'whatsapp-status.js'), 'utf8'), context, { filename:'whatsapp-status.js' });
+
+  listeners.get('click')({
+    preventDefault() {},
+    stopImmediatePropagation() {},
+    target:{
+      closest(selector) {
+        if (selector === '.lead-card') return card;
+        if (selector === '[data-action]') return { dataset:{ action:'open' } };
+        return null;
+      },
+    },
+  });
+
+  statusSelect.value = 'not_on_whatsapp';
+  listeners.get('status:change')();
+  assert.equal(whatsappButton.disabled, true);
+  assert.equal(whatsappButton.title, 'Marked as not on WhatsApp');
+
+  statusSelect.value = 'confirmed';
+  listeners.get('status:change')();
+  assert.equal(whatsappButton.disabled, false);
+  assert.equal(whatsappButton.title, '');
 });
 
 test('mobile layout keeps lead details available and names repeated actions', () => {
