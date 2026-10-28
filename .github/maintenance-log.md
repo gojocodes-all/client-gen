@@ -1,5 +1,14 @@
 # Maintenance log
 
+## 2026-10-28 — Document the Excel offline boundary
+
+- **Rationale:** The README described basic offline support and separately noted the on-demand SheetJS CDN, but did not explain that XLSX/XLS imports are outside the service worker's same-origin cache. Users could reasonably expect every advertised import format to work offline after installation.
+- **Files changed:** `README.md` and `.github/maintenance-log.md`.
+- **Changes:** Clarify which formats remain fully local after the core shell is cached, explain the first-use network requirement and ordinary-browser-cache limitation for Excel parsing, and provide CSV or JSON as the reliable disconnected alternative.
+- **Validation:** Cross-checked the documented boundary against `app.js`'s pinned SheetJS loader and `sw.js`'s same-origin cache policy; ran `npm run validate` (all application and crawler syntax checks plus 13 tests); ran `git diff --check`; reviewed the complete diff for accuracy, privacy, security, backward compatibility, and repository scope.
+- **Risk:** Low. Documentation only; import code, parser versions, service-worker behavior, cached assets, dependencies, stored lead data, crawler behavior, and deployment configuration are unchanged.
+- **Rollback:** Revert this pull request to restore the prior shorter offline description; no runtime, cache, data, dependency, or deployment rollback is required.
+
 ## 2026-10-23 — Restore WhatsApp actions after status correction
 
 - **Rationale:** Marking a lead as “Not on WhatsApp” correctly disabled its

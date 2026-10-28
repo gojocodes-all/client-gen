@@ -15,13 +15,19 @@ A local-first lead intelligence and contextual outreach workspace for messy craw
 - Deduplicates by phone, email, website or name/location.
 - Exports filtered leads to CSV and supports full workspace backup.
 - Stores imported data in IndexedDB on the user's device. No lead backend is required.
-- Installable PWA with basic offline support.
+- Installable PWA with a cached core shell and offline support for non-Excel imports.
 
 ## Architecture
 
 This app intentionally uses modern browser APIs rather than a framework because the product is a single-user, local-first data tool with no server-rendered pages or shared state. That keeps the deployment tiny and means lead files do not leave the user's device.
 
 Excel parsing is loaded on demand from the pinned SheetJS Community Edition standalone build (`0.20.3`) hosted by the official SheetJS CDN. JSON/CSV/TSV/XML/HTML parsing is handled locally. XML files containing `DOCTYPE` are rejected before parsing.
+
+## Offline behavior
+
+After one successful online load installs the service worker, the application shell and same-origin scripts are available offline. JSON, NDJSON/JSONL, CSV, TSV, XML and HTML imports continue to run entirely in the browser.
+
+XLSX and XLS are the exception: their parser is not bundled or stored by the service worker. The first Excel import in a browser session must be able to reach the pinned SheetJS CDN URL. It may still work from the browser's ordinary HTTP cache, but that cache is not part of Client Gen's offline guarantee. If reliable disconnected import is required, export the source data as CSV or JSON before going offline.
 
 ## Repository layout
 
