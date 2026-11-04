@@ -89,7 +89,13 @@
   }
 
   function saveStatuses() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(statuses));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(statuses));
+      return true;
+    } catch (error) {
+      console.warn('Could not save WhatsApp statuses', error);
+      return false;
+    }
   }
 
   function getStatus(id) {

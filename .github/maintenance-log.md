@@ -1,5 +1,27 @@
 # Maintenance log
 
+## 2026-11-04 — Keep WhatsApp status changes usable without storage
+
+- **Rationale:** Loading and clearing WhatsApp verification statuses already
+  tolerated unavailable browser storage, but saving a status did not. When
+  `localStorage.setItem()` threw in a privacy-restricted context, the change
+  handler stopped before refreshing the lead card and active filter.
+- **Files changed:** `whatsapp-status.js` now treats persistence as best effort
+  while retaining the selected status for the current page session;
+  `test/browser-wiring.test.js` reproduces blocked writes and verifies both
+  disabling and restoring the WhatsApp action; `sw.js` advances the offline
+  cache so deployed clients receive the corrected script; this log records the
+  maintenance decision.
+- **Validation:** `npm run validate`, `git diff --check`, and a complete diff
+  review covering normal persistence, blocked storage, filters, lead-level
+  contact guards, offline delivery, privacy, security, and backward
+  compatibility.
+- **Risk:** Low. Successful `localStorage` persistence and the stored status
+  format are unchanged. In restricted contexts, status changes now remain
+  usable for the current page session but still cannot survive a reload.
+- **Rollback:** Revert this pull request to restore fail-fast status writes and
+  the previous service-worker cache key.
+
 ## 2026-10-28 — Document the Excel offline boundary
 
 - **Rationale:** The README described basic offline support and separately noted the on-demand SheetJS CDN, but did not explain that XLSX/XLS imports are outside the service worker's same-origin cache. Users could reasonably expect every advertised import format to work offline after installation.
