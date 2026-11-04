@@ -39,7 +39,7 @@ test('browser entrypoint loads the parser module before the UI controller', () =
 test('offline core cache includes every required application script', () => {
   const serviceWorker = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 
-  assert.match(serviceWorker, /const CACHE = 'client-gen-v6';/);
+  assert.match(serviceWorker, /const CACHE = 'client-gen-v7';/);
   assert.match(serviceWorker, /'\/data-parsers\.js'/);
   assert.match(serviceWorker, /'\/app\.js'/);
   assert.match(serviceWorker, /'\/whatsapp-status\.js'/);
@@ -85,7 +85,7 @@ test('WhatsApp status cleanup reports unavailable browser storage', () => {
   assert.equal(context.ClientGenWhatsAppStatus.clear(), false);
 });
 
-test('confirming a WhatsApp lead restores its available action immediately', () => {
+test('WhatsApp status changes remain usable when browser storage is blocked', () => {
   const listeners = new Map();
   const badge = { dataset:{}, textContent:'' };
   const whatsappButton = {
@@ -124,13 +124,16 @@ test('confirming a WhatsApp lead restores its available action immediately', () 
     saveLeadBtn:{ addEventListener() {} },
   };
   const browserGlobal = {
-    console,
+    console:{ warn() {} },
     document:{
       createElement() { return { className:'', textContent:'' }; },
       getElementById(id) { return elements[id] || null; },
       head:{ appendChild() {} },
     },
-    localStorage:{ getItem() { return null; }, setItem() {} },
+    localStorage:{
+      getItem() { return null; },
+      setItem() { throw new Error('storage blocked'); },
+    },
     MutationObserver:class { constructor() {} observe() {} },
   };
   browserGlobal.window = browserGlobal;
