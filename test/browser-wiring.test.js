@@ -9,10 +9,12 @@ const root = path.resolve(__dirname, '..');
 test('browser entrypoint loads the parser module before the UI controller', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const parserPosition = html.indexOf('<script src="/data-parsers.js" defer></script>');
+  const loaderPosition = html.indexOf('<script src="/sheetjs-loader.js" defer></script>');
   const applicationPosition = html.indexOf('<script src="/app.js" defer></script>');
 
   assert.ok(parserPosition >= 0, 'parser script is present');
-  assert.ok(applicationPosition > parserPosition, 'parser script loads before app.js');
+  assert.ok(loaderPosition > parserPosition, 'Excel loader follows the data parsers');
+  assert.ok(applicationPosition > loaderPosition, 'browser dependencies load before app.js');
 
   const listeners = new Map();
   const browserGlobal = {
@@ -30,6 +32,7 @@ test('browser entrypoint loads the parser module before the UI controller', () =
   const context = vm.createContext(browserGlobal);
 
   vm.runInContext(fs.readFileSync(path.join(root, 'data-parsers.js'), 'utf8'), context, { filename:'data-parsers.js' });
+  vm.runInContext(fs.readFileSync(path.join(root, 'sheetjs-loader.js'), 'utf8'), context, { filename:'sheetjs-loader.js' });
   vm.runInContext(fs.readFileSync(path.join(root, 'app.js'), 'utf8'), context, { filename:'app.js' });
 
   assert.equal(typeof context.ClientGenDataParsers.parseDelimited, 'function');
@@ -39,8 +42,9 @@ test('browser entrypoint loads the parser module before the UI controller', () =
 test('offline core cache includes every required application script', () => {
   const serviceWorker = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 
-  assert.match(serviceWorker, /const CACHE = 'client-gen-v7';/);
+  assert.match(serviceWorker, /const CACHE = 'client-gen-v8';/);
   assert.match(serviceWorker, /'\/data-parsers\.js'/);
+  assert.match(serviceWorker, /'\/sheetjs-loader\.js'/);
   assert.match(serviceWorker, /'\/app\.js'/);
   assert.match(serviceWorker, /'\/whatsapp-status\.js'/);
 });

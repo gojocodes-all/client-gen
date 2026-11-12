@@ -1,5 +1,13 @@
 # Maintenance log
 
+## 2026-11-12 — Allow Excel parser downloads to recover after failure
+
+- **Rationale:** The on-demand SheetJS loader cached its first promise indefinitely. If the CDN request failed while the device was offline or the network was unstable, every later Excel import reused the rejected promise, so the UI's instruction to reconnect and try again could not work until the page was refreshed.
+- **Files changed:** `sheetjs-loader.js` owns the single-flight SheetJS load and clears failed or incomplete attempts; `app.js` consumes that boundary; `index.html`, `sw.js`, and `package.json` load, cache, and syntax-check it; `test/sheetjs-loader.test.js` covers network failure, missing initialization, retry, cleanup, and concurrent calls; `test/browser-wiring.test.js` locks script order and offline delivery; `README.md` documents the retry behavior; this log records the decision.
+- **Validation:** `node --check sheetjs-loader.js`; `node --test sheetjs-loader.test.js` (3 tests); the pull-request workflow runs `npm run validate`, including every root regression test, all syntax checks, and crawler syntax validation; complete diff review for retry races, duplicate loads, offline caching, privacy, security, backward compatibility, and repository conventions.
+- **Risk level:** Low. Successful Excel imports keep the pinned SheetJS 0.20.3 URL and existing parsing path. Only failed or incomplete script loads are removed and made retryable; JSON, CSV, TSV, XML, HTML, IndexedDB, outreach, and crawler behavior are unchanged.
+- **Rollback:** Revert this pull request's squash commit to restore the inline one-shot loader and previous service-worker cache key; no data, dependency, schema, or deployment rollback is required.
+
 ## 2026-11-04 — Keep WhatsApp status changes usable without storage
 
 - **Rationale:** Loading and clearing WhatsApp verification statuses already

@@ -27,7 +27,7 @@ Excel parsing is loaded on demand from the pinned SheetJS Community Edition stan
 
 After one successful online load installs the service worker, the application shell and same-origin scripts are available offline. JSON, NDJSON/JSONL, CSV, TSV, XML and HTML imports continue to run entirely in the browser.
 
-XLSX and XLS are the exception: their parser is not bundled or stored by the service worker. The first Excel import in a browser session must be able to reach the pinned SheetJS CDN URL. It may still work from the browser's ordinary HTTP cache, but that cache is not part of Client Gen's offline guarantee. If reliable disconnected import is required, export the source data as CSV or JSON before going offline.
+XLSX and XLS are the exception: their parser is not bundled or stored by the service worker. The first Excel import in a browser session must be able to reach the pinned SheetJS CDN URL. It may still work from the browser's ordinary HTTP cache, but that cache is not part of Client Gen's offline guarantee. If reliable disconnected import is required, export the source data as CSV or JSON before going offline. After reconnecting, retry the Excel import; a failed parser download no longer requires a page refresh.
 
 ## Repository layout
 
