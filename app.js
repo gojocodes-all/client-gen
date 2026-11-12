@@ -4,12 +4,12 @@
   const APP_VERSION = '1.0.0';
   const DB_NAME = 'client-gen-db';
   const DB_VERSION = 1;
-  const XLSX_URL = 'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
   const MAX_FILE_BYTES = 25 * 1024 * 1024;
   const MAX_ROWS_PER_DATASET = 25000;
   const DEFAULT_PROFILE = { name: 'Gojo', brand: 'GOJO.DEV' };
 
   if (!window.ClientGenDataParsers) throw new Error('Client Gen data parsers failed to load.');
+  if (!window.ClientGenSheetJSLoader) throw new Error('Client Gen Excel parser loader failed to load.');
   const { extractRecordsFromJson, parseDelimited, detectDelimiter } = window.ClientGenDataParsers;
 
   const ROLE_CONFIG = {
@@ -107,7 +107,6 @@
   const els = {};
   let saveTimer = null;
   let toastTimer = null;
-  let xlsxPromise = null;
 
   document.addEventListener('DOMContentLoaded', init);
 
@@ -242,7 +241,7 @@
   }
 
   async function parseExcel(file) {
-    await loadSheetJS();
+    await window.ClientGenSheetJSLoader.load();
     const wb = window.XLSX.read(await file.arrayBuffer(), { type:'array', cellDates:false });
     const rows = [];
     for (const sheetName of wb.SheetNames) {
@@ -251,20 +250,6 @@
       parsed.forEach(row => rows.push({ ...row, __sheet: sheetName }));
     }
     return { format:'Excel', rows };
-  }
-
-  function loadSheetJS() {
-    if (window.XLSX) return Promise.resolve();
-    if (xlsxPromise) return xlsxPromise;
-    xlsxPromise = new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = XLSX_URL;
-      script.async = true;
-      script.onload = resolve;
-      script.onerror = () => reject(new Error('Could not load the Excel parser. Check your internet connection and try again.'));
-      document.head.appendChild(script);
-    });
-    return xlsxPromise;
   }
 
   function parseHtmlTables(text) {
