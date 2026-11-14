@@ -1,5 +1,34 @@
 # Maintenance log
 
+## 2026-11-14 — Document the crawler's verified operating boundaries
+
+- **Rationale:** The optional crawler's guide only listed a short feature
+  summary and two startup commands. It did not explain that the crawler is a
+  separate service, its accepted configuration, internal API, transient job
+  lifecycle, generated Crawlee storage, unauthenticated access model,
+  private-network protections, validation boundary, or independent deployment
+  requirements. Contributors and operators therefore had to reverse-engineer
+  security- and privacy-relevant behavior from the server.
+- **Files changed:** `crawler-app/README.md` now documents verified setup,
+  collection scope, controls, limits, API routes, data lifecycle, privacy and
+  security boundaries, commands, structure, deployment, and contribution
+  guidance; `.gitignore` excludes Crawlee's generated
+  `crawler-app/storage/` directory; this maintenance log records the work.
+- **Validation:** Installed the declared crawler dependencies without creating
+  a lockfile; ran `npm run check` in `crawler-app/`; ran the root
+  `npm run validate` gate; cross-checked every documented route, field,
+  default, limit, timeout, lifecycle rule, environment variable, path, and
+  deployment statement against both package manifests, `src/server.js`, the
+  dashboard source, root documentation, workflow, and current tree; ran
+  `git diff --check`; reviewed the complete diff for factual accuracy,
+  security, privacy, compatibility, and repository scope.
+- **Risk level:** Low. Documentation and an ignore rule only; application code,
+  crawler behavior, dependencies, generated output, API responses, stored lead
+  data, deployment configuration, and runtime state are unchanged.
+- **Rollback:** Revert this pull request's squash commit to restore the short
+  crawler guide and allow generated Crawlee storage to appear as untracked
+  files. No runtime, data, dependency, or deployment rollback is required.
+
 ## 2026-11-12 — Allow Excel parser downloads to recover after failure
 
 - **Rationale:** The on-demand SheetJS loader cached its first promise indefinitely. If the CDN request failed while the device was offline or the network was unstable, every later Excel import reused the rejected promise, so the UI's instruction to reconnect and try again could not work until the page was refreshed.
