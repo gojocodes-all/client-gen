@@ -1,5 +1,27 @@
 # Maintenance log
 
+## 2026-11-18 — Detect delimiters across multiline quoted fields
+
+- **Rationale:** Automatic delimiter detection sampled physical lines instead
+  of complete delimited records. A semicolon- or tab-delimited import with a
+  multiline quoted field could therefore count commas inside the continuation
+  line as separators and parse every real column into a single field.
+- **Files changed:** `data-parsers.js` now samples complete logical records
+  while respecting quoted newlines and escaped quotes; the parser regression
+  suite covers the previously misdetected semicolon input; the browser-wiring
+  contract and `sw.js` advance the offline cache so installed clients receive
+  the corrected parser; and this log records the maintenance decision.
+- **Validation:** Reproduced the prior one-column import, ran
+  `npm run validate`, and ran `git diff --check`; reviewed the complete diff for
+  delimiter precedence, CSV quoting compatibility, offline delivery, security,
+  backward compatibility, and repository scope.
+- **Risk level:** Low. Explicit `.csv` and `.tsv` imports keep their existing
+  delimiters, and ordinary single-line automatic detection is unchanged. The
+  new scanner only groups embedded quoted newlines before scoring candidates.
+- **Rollback:** Revert this pull request's squash commit to restore physical-line
+  sampling and the previous service-worker cache key. Stored lead data and
+  workspace schemas are unchanged.
+
 ## 2026-11-14 — Document the crawler's verified operating boundaries
 
 - **Rationale:** The optional crawler's guide only listed a short feature
