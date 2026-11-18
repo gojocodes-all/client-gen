@@ -15,26 +15,10 @@
   const visibleLeadCount = document.getElementById('visibleLeadCount');
   const saveLeadBtn = document.getElementById('saveLeadBtn');
 
+  if (!statusFilter || !statusSelect || !leadList || !leadDialog) return;
+
   let activeLeadId = null;
   let statuses = loadStatuses();
-
-  window.ClientGenWhatsAppStatus = {
-    clear() {
-      statuses = {};
-      let cleared = true;
-      try {
-        localStorage.removeItem(STORAGE_KEY);
-      } catch (error) {
-        cleared = false;
-        console.warn('Could not clear WhatsApp statuses', error);
-      }
-      decorateCards();
-      applyFilter();
-      return cleared;
-    }
-  };
-
-  if (!statusFilter || !statusSelect || !leadList || !leadDialog) return;
 
   injectStyles();
   addExplanation();
@@ -89,13 +73,7 @@
   }
 
   function saveStatuses() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(statuses));
-      return true;
-    } catch (error) {
-      console.warn('Could not save WhatsApp statuses', error);
-      return false;
-    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(statuses));
   }
 
   function getStatus(id) {
@@ -109,7 +87,6 @@
   }
 
   function decorateCards() {
-    if (!leadList) return;
     leadList.querySelectorAll('.lead-card').forEach(card => {
       const id = card.dataset.id;
       const value = getStatus(id);
@@ -124,17 +101,14 @@
       badge.textContent = LABELS[value];
 
       const waButton = card.querySelector('[data-action="wa"]');
-      if (waButton) {
-        const baseDisabled = waButton.dataset.baseDisabled === 'true';
-        const statusDisabled = value === 'not_on_whatsapp';
-        waButton.disabled = baseDisabled || statusDisabled;
-        waButton.title = statusDisabled ? 'Marked as not on WhatsApp' : '';
+      if (waButton && value === 'not_on_whatsapp') {
+        waButton.disabled = true;
+        waButton.title = 'Marked as not on WhatsApp';
       }
     });
   }
 
   function applyFilter() {
-    if (!statusFilter || !leadList) return;
     const selected = statusFilter.value;
     let visible = 0;
     leadList.querySelectorAll('.lead-card').forEach(card => {
