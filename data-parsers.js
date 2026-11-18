@@ -83,13 +83,13 @@
   }
 
   function detectDelimiter(text) {
-    const firstLines = text.split(/\r?\n/).slice(0, 6).join('\n');
+    const firstRows = sampleLogicalRows(text, 6);
     const options = [',', '\t', ';', '|'];
     let best = ',';
     let bestScore = -1;
 
     for (const delimiter of options) {
-      const counts = firstLines.split('\n').map(line => countOutsideQuotes(line, delimiter));
+      const counts = firstRows.map(row => countOutsideQuotes(row, delimiter));
       const nonzero = counts.filter(Boolean);
       const average = nonzero.reduce((total, count) => total + count, 0) / Math.max(nonzero.length, 1);
       const variance = nonzero.reduce((total, count) => total + Math.abs(count - average), 0) / Math.max(nonzero.length, 1);
@@ -100,6 +100,29 @@
       }
     }
     return best;
+  }
+
+  function sampleLogicalRows(text, limit) {
+    const rows = [];
+    let row = '';
+    let quoted = false;
+
+    for (let index = 0; index < text.length && rows.length < limit; index += 1) {
+      const character = text[index];
+      if (character === '"') {
+        row += character;
+        if (quoted && text[index + 1] === '"') {
+          row += text[index + 1];
+          index += 1;
+        } else quoted = !quoted;
+      } else if (character === '\n' && !quoted) {
+        rows.push(row.endsWith('\r') ? row.slice(0, -1) : row);
+        row = '';
+      } else row += character;
+    }
+
+    if (rows.length < limit && row) rows.push(row);
+    return rows;
   }
 
   function countOutsideQuotes(line, delimiter) {

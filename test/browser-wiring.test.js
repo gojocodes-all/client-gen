@@ -42,7 +42,7 @@ test('browser entrypoint loads the parser module before the UI controller', () =
 test('offline core cache includes every required application script', () => {
   const serviceWorker = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 
-  assert.match(serviceWorker, /const CACHE = 'client-gen-v8';/);
+  assert.match(serviceWorker, /const CACHE = 'client-gen-v9';/);
   assert.match(serviceWorker, /'\/data-parsers\.js'/);
   assert.match(serviceWorker, /'\/sheetjs-loader\.js'/);
   assert.match(serviceWorker, /'\/app\.js'/);

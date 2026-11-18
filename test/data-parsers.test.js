@@ -32,6 +32,17 @@ test('detectDelimiter ignores separators inside quoted fields', () => {
   assert.equal(detectDelimiter('name\tphone\nAda\t08012345678'), '\t');
 });
 
+test('detectDelimiter treats multiline quoted fields as one record', () => {
+  const text = 'name;notes\nAda;"First line\nhas, many, commas, here"\nGojo;Remote';
+  const delimiter = detectDelimiter(text);
+
+  assert.equal(delimiter, ';');
+  assert.deepEqual(parseDelimited(text, delimiter), [
+    { name: 'Ada', notes: 'First line\nhas, many, commas, here' },
+    { name: 'Gojo', notes: 'Remote' }
+  ]);
+});
+
 test('extractRecordsFromJson selects the strongest nested record collection', () => {
   const leads = [
     { name: 'Ada Cafe', phone: '08012345678' },
