@@ -1,8 +1,0 @@
-node_modules/
-crawler-app/storage/
-.env
-.env.*
-!.env.example
-coverage/
-*.log
-.DS_Store

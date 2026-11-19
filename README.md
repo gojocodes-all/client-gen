@@ -15,36 +15,13 @@ A local-first lead intelligence and contextual outreach workspace for messy craw
 - Deduplicates by phone, email, website or name/location.
 - Exports filtered leads to CSV and supports full workspace backup.
 - Stores imported data in IndexedDB on the user's device. No lead backend is required.
-- Installable PWA with a cached core shell and offline support for non-Excel imports.
+- Installable PWA with basic offline support.
 
 ## Architecture
 
 This app intentionally uses modern browser APIs rather than a framework because the product is a single-user, local-first data tool with no server-rendered pages or shared state. That keeps the deployment tiny and means lead files do not leave the user's device.
 
 Excel parsing is loaded on demand from the pinned SheetJS Community Edition standalone build (`0.20.3`) hosted by the official SheetJS CDN. JSON/CSV/TSV/XML/HTML parsing is handled locally. XML files containing `DOCTYPE` are rejected before parsing.
-
-## Offline behavior
-
-After one successful online load installs the service worker, the application shell and same-origin scripts are available offline. JSON, NDJSON/JSONL, CSV, TSV, XML and HTML imports continue to run entirely in the browser.
-
-XLSX and XLS are the exception: their parser is not bundled or stored by the service worker. The first Excel import in a browser session must be able to reach the pinned SheetJS CDN URL. It may still work from the browser's ordinary HTTP cache, but that cache is not part of Client Gen's offline guarantee. If reliable disconnected import is required, export the source data as CSV or JSON before going offline. After reconnecting, retry the Excel import; a failed parser download no longer requires a page refresh.
-
-## Repository layout
-
-The repository contains two independently-run applications:
-
-- The repository root is the static, local-first Client Gen workspace. It imports lead files in the browser and stores the workspace in IndexedDB.
-- `crawler-app/` is an optional Node.js 20+ Express/Crawlee service for collecting public business signals. It exports JSON or CSV that can then be imported into the root workspace; the two applications do not require a live connection to each other.
-
-To run the optional crawler locally:
-
-```bash
-cd crawler-app
-npm install
-npm start
-```
-
-Open `http://localhost:3000`. Set `PORT` to use a different port. See [the crawler guide](crawler-app/README.md) for its scope and limitations.
 
 ## Run locally
 
@@ -56,21 +33,9 @@ python3 -m http.server 8080
 
 Then open `http://localhost:8080`.
 
-## Development
-
-The JSON and delimited-text import rules live in `data-parsers.js`, separate from UI and persistence code. They work in both the browser and Node so the import contract can be tested without a DOM.
-
-Run all syntax checks—including the crawler package—and the parser regression suite with:
-
-```bash
-npm run validate
-```
-
-The root validation suite requires Node.js 20 or newer and does not install crawler dependencies. GitHub Actions runs the same command for pull requests and updates to `main`.
-
 ## Deploy
 
-The root Client Gen workspace is static and Vercel-compatible. It requires no environment variables. The optional `crawler-app/` service is a separate long-running Node.js process and is not deployed by the root static-site configuration; host it separately if you need the crawler outside local development.
+The repo is static and Vercel-compatible. No environment variables are required.
 
 ## Privacy / outreach behavior
 

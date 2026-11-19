@@ -1,5 +1,5 @@
-const CACHE = 'client-gen-v9';
-const CORE = ['/', '/index.html', '/styles.css', '/data-parsers.js', '/sheetjs-loader.js', '/app.js', '/whatsapp-status.js', '/manifest.webmanifest', '/icon.svg'];
+const CACHE = 'client-gen-v2';
+const CORE = ['/', '/index.html', '/styles.css', '/app.js', '/manifest.webmanifest', '/icon.svg'];
 
 self.addEventListener('install', event => {
   event.waitUntil(
